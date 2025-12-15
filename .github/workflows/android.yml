@@ -21,20 +21,22 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y \
-          zip unzip openjdk-17-jdk \
-          libffi-dev libssl-dev \
-          build-essential \
-          autoconf automake libtool pkg-config \
-          zlib1g-dev
-
-    - name: Accept Android SDK licenses
-      run: |
-        yes | sdkmanager --licenses || true
+          git zip unzip openjdk-17-jdk \
+          python3-pip \
+          autoconf libtool pkg-config \
+          zlib1g-dev libncurses5-dev libncursesw5-dev \
+          libtinfo5 cmake libffi-dev libssl-dev
 
     - name: Install Buildozer
       run: |
-        python -m pip install --upgrade pip
-        pip install cython==0.29.36 buildozer
+        pip install --upgrade pip
+        pip install cython buildozer
+
+    - name: Accept Android licenses
+      run: |
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        yes | sdkmanager --licenses || true
 
     - name: Build APK
       run: |
@@ -43,5 +45,5 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: APK
+        name: apk
         path: bin/*.apk
