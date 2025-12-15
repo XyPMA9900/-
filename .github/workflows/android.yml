@@ -30,6 +30,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y \
+          git \
           unzip zip \
           build-essential \
           libffi-dev \
@@ -41,7 +42,6 @@ jobs:
           libreadline-dev \
           libbz2-dev \
           liblzma-dev
-
     # 🔹 Android SDK
     - name: Install Android SDK
       run: |
