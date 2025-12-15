@@ -3,6 +3,13 @@ title = KotoKliker
 package.name = kotokliker
 package.domain = org.koto
 
+android.api = 33
+android.minapi = 21
+android.build_tools_version = 33.0.2
+
+android.sdk_path = /home/runner/android-sdk
+android.ndk_path = /home/runner/android-sdk/ndk/25.2.9519653
+
 source.dir = .
 source.include_exts = py,json
 
