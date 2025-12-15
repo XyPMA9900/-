@@ -13,13 +13,9 @@ requirements = python3,kivy
 orientation = portrait
 fullscreen = 1
 
-android.permissions = INTERNET
-
 android.api = 33
 android.minapi = 21
-android.build_tools_version = 33.0.2
-
-android.sdk_path = /home/runner/android-sdk
-android.ndk_path = /home/runner/android-sdk/ndk/25.2.9519653
-
+android.ndk = 25b
 android.archs = arm64-v8a,armeabi-v7a
+
+android.permissions = INTERNET
