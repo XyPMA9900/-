@@ -1,4 +1,5 @@
-name: Build APK
+- name: Accept Android SDK licenses
+      run: yes | sdkmanager --licenses
 
 on:
   push:
