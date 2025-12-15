@@ -6,63 +6,71 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
+    # 🔹 Python (Buildozer стабильно работает с 3.10)
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.10"
 
+    # 🔹 Java 17 (ОБЯЗАТЕЛЬНО для Android SDK)
+    - name: Set up Java 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    # 🔹 Системные зависимости
     - name: Install system dependencies
       run: |
         sudo apt update
         sudo apt install -y \
-          openjdk-17-jdk \
           unzip zip \
-          autoconf libtool pkg-config \
-          zlib1g-dev libncurses5-dev libncursesw5-dev \
-          libtinfo5 cmake libffi-dev libssl-dev \
-          python3-pip
+          build-essential \
+          libffi-dev \
+          libssl-dev \
+          libsqlite3-dev \
+          zlib1g-dev \
+          libncurses5-dev \
+          libncursesw5-dev \
+          libreadline-dev \
+          libbz2-dev \
+          liblzma-dev
 
-    - name: Set ANDROID_HOME
-      run: |
-        echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-        echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
-        echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
-        echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
-
+    # 🔹 Android SDK
     - name: Install Android SDK
       run: |
-        mkdir -p $HOME/android-sdk/cmdline-tools
-        cd $HOME/android-sdk/cmdline-tools
+        mkdir -p $HOME/android-sdk
+        cd $HOME/android-sdk
         wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-        unzip commandlinetools-linux-11076708_latest.zip
-        mv cmdline-tools latest
-
-    - name: Accept Android licenses
-      run: |
+        unzip commandlinetools-linux-*.zip
+        mkdir -p cmdline-tools/latest
+        mv cmdline-tools/* cmdline-tools/latest || true
+        export ANDROID_HOME=$HOME/android-sdk
+        export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
         yes | sdkmanager --licenses
+        sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
-    - name: Install Android packages
-      run: |
-        sdkmanager \
-          "platform-tools" \
-          "platforms;android-33" \
-          "build-tools;33.0.2"
-
+    # 🔹 Buildozer
     - name: Install Buildozer
       run: |
         pip install --upgrade pip
-        pip install cython buildozer
+        pip install buildozer cython
 
+    # 🔹 Сборка APK
     - name: Build APK
+      env:
+        ANDROID_HOME: $HOME/android-sdk
+        PATH: $HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH
       run: |
         buildozer android debug
 
+    # 🔹 Загрузка APK
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
